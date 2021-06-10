@@ -1,0 +1,182 @@
+<html>
+<head>
+
+	<style>
+		
+		fieldset
+		{
+			border: 1px solid black;
+		}
+
+		fieldset > legend
+		{
+			font-weight: bold;
+		}
+
+		dl > dt, dl > dd
+		{
+			margin-left: 0;
+		}
+
+		input[type=text]
+		{
+			width: 10em;
+			padding: 0.5em;
+			margin: 0.5em;
+			border: 1px solid black;
+			font-family: 'monospace';
+		}
+
+	</style>
+
+	<script>
+
+		function update()
+		{
+			var elements =
+			{
+				// input
+				ImageWidth: document.getElementById('ImageWidth'),
+				ImageHeight: document.getElementById('ImageHeight'),
+				ImageChannels: document.getElementById('ImageChannels'),
+				CameraCount: document.getElementById('CameraCount'),
+				CycleTime: document.getElementById('CycleTime'),
+				CycleTimeUnit: document.getElementById('CycleTimeUnit'),
+				CycleTimeTypeLine: document.getElementById('CycleTimeTypeLine'),
+				CycleTimeTypeImage: document.getElementById('CycleTimeTypeImage'),
+
+				// output
+				ImageCycleTime: document.getElementById('ImageCycleTime'),
+				ImageCycleTimeUnit: document.getElementById('ImageCycleTimeUnit'),
+				LineCycleTime: document.getElementById('LineCycleTime'),
+				LineCycleTimeUnit: document.getElementById('LineCycleTimeUnit'),
+				LinesPerSecond: document.getElementById('LinesPerSecond'),
+				ImagesPerSecond: document.getElementById('ImagesPerSecond'),
+				BytesPerImage: document.getElementById('BytesPerImage'),
+				GigaBitPerSecond: document.getElementById('GigaBitPerSecond'),
+			};
+
+			var input =
+			{
+				image:
+				{
+					width: NaN,
+					height: NaN,
+					channels: NaN,
+				},
+				camera:
+				{
+					count: NaN,
+				},
+				cycletime:
+				{
+					value: NaN,
+					factor: NaN,
+				},
+			};
+
+			input.image.width = parseFloat(elements.ImageWidth.value);
+			input.image.height = parseFloat(elements.ImageHeight.value);
+			input.image.channels = parseFloat(elements.ImageChannels.value);
+			input.camera.count = parseFloat(elements.CameraCount.value);
+			input.cycletime.value = parseFloat(elements.CycleTime.value.replace(',', '.'));
+
+			if (elements.CycleTimeTypeLine.checked)
+			{
+				elements.CycleTimeUnit.textContent = '[us]';
+
+				input.cycletime.factor = 1e-6;
+			}
+
+			if (elements.CycleTimeTypeImage.checked)
+			{
+				elements.CycleTimeUnit.textContent = '[us]';
+
+				input.cycletime.factor = 1e-6 / input.image.height;
+			}
+
+			elements.LineCycleTimeUnit.textContent = '[us]';
+			elements.ImageCycleTimeUnit.textContent = '[us]';
+
+			elements.LineCycleTime.value = input.cycletime.value * input.cycletime.factor * 1e6;
+			elements.ImageCycleTime.value = input.image.height * input.cycletime.value * input.cycletime.factor * 1e6;
+			elements.LinesPerSecond.value = Math.round(1 / (input.cycletime.value * input.cycletime.factor));
+			elements.ImagesPerSecond.value = Math.round(1 / (input.image.height * input.cycletime.value * input.cycletime.factor));
+			elements.BytesPerImage.value = input.image.width * input.image.height * input.image.channels;
+			elements.GigaBitPerSecond.value = input.camera.count * parseFloat(elements.ImagesPerSecond.value) * parseFloat(elements.BytesPerImage.value) * (8 / Math.pow(1024, 3));
+		}
+
+	</script>
+
+</head>
+<body>
+
+<h1>Camera Configuration Calculus</h1>
+
+<fieldset>
+<legend>Specification</legend>
+<dl>
+
+	<dt><label for="ImageWidth">Image Width</label></dt>
+	<dd><input type="text" id="ImageWidth" onclick="this.select()" onkeyup="update()" value="2736"></dd>
+
+	<dt><label for="ImageHeight">Image Height</label></dt>
+	<dd><input type="text" id="ImageHeight" onclick="this.select()" onkeyup="update()" value="16"></dd>
+
+	<dt><label for="ImageChannels">Image Channels</label></dt>
+	<dd><input type="text" id="ImageChannels" onclick="this.select()" onkeyup="update()" value="3"></dd>
+
+	<dt><label for="CameraCount">Camera Count</label></dt>
+	<dd><input type="text" id="CameraCount" onclick="this.select()" onkeyup="update()" value="6"></dd>
+
+	<dt><label for="CycleTime">Cycle Time <span id="CycleTimeUnit"></span></label></dt>
+	<dd><input type="text" id="CycleTime" onclick="this.select()" onkeyup="update()" value="54"></dd>
+	<dd>
+
+		<input type="radio" id="CycleTimeTypeLine" name="CycleTimeType" onclick="update()" checked>
+		<label for="CycleTimeTypeLine">Line</label>
+
+		<input type="radio" id="CycleTimeTypeImage" name="CycleTimeType" onclick="update()">
+		<label for="CycleTimeTypeImage">Image</label>
+
+	</dd>
+
+</dl>
+</fieldset>
+
+<fieldset>
+<legend>Result</legend>
+<dl>
+
+	<dt><label for="LineCycleTime">Line Cycle Time <span id="LineCycleTimeUnit"></span></label></dt>
+	<dd><input type="text" id="LineCycleTime" disabled></dd>
+
+	<dt><label for="ImageCycleTime">Image Cycle Time <span id="ImageCycleTimeUnit"></span></label></dt>
+	<dd><input type="text" id="ImageCycleTime" disabled></dd>
+
+	<dt><label for="LinesPerSecond">Lines Per Second</label></dt>
+	<dd><input type="text" id="LinesPerSecond" disabled></dd>
+
+	<dt><label for="ImagesPerSecond">Images Per Second</label></dt>
+	<dd><input type="text" id="ImagesPerSecond" disabled></dd>
+
+	<dt><label for="BytesPerImage">Bytes Per Image</label></dt>
+	<dd><input type="text" id="BytesPerImage" disabled></dd>
+
+	<dt><label for="GigaBitPerSecond">Gbit/s</label></dt>
+	<dd><input type="text" id="GigaBitPerSecond" disabled> <span>&sum;</span></dd>
+
+</dl>
+</fieldset>
+
+<script type="text/javascript">
+
+	window.addEventListener('load', function()
+	{
+	    update();
+	});
+
+</script>
+
+</body>
+</html>
