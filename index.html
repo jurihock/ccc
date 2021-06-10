@@ -1,30 +1,17 @@
 <html>
 <head>
 
+	<title>Camera Configuration Calculus</title>
+
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+
 	<style>
-		
-		fieldset
-		{
-			border: 1px solid black;
-		}
 
-		fieldset > legend
+		body
 		{
-			font-weight: bold;
-		}
-
-		dl > dt, dl > dd
-		{
-			margin-left: 0;
-		}
-
-		input[type=text]
-		{
-			width: 10em;
-			padding: 0.5em;
-			margin: 0.5em;
-			border: 1px solid black;
-			font-family: 'monospace';
+			margin-top:  1em;
 		}
 
 	</style>
@@ -35,7 +22,6 @@
 		{
 			var elements =
 			{
-				// input
 				ImageWidth: document.getElementById('ImageWidth'),
 				ImageHeight: document.getElementById('ImageHeight'),
 				ImageChannels: document.getElementById('ImageChannels'),
@@ -45,7 +31,6 @@
 				CycleTimeTypeLine: document.getElementById('CycleTimeTypeLine'),
 				CycleTimeTypeImage: document.getElementById('CycleTimeTypeImage'),
 
-				// output
 				ImageCycleTime: document.getElementById('ImageCycleTime'),
 				ImageCycleTimeUnit: document.getElementById('ImageCycleTimeUnit'),
 				LineCycleTime: document.getElementById('LineCycleTime'),
@@ -98,8 +83,8 @@
 			elements.LineCycleTimeUnit.textContent = '[us]';
 			elements.ImageCycleTimeUnit.textContent = '[us]';
 
-			elements.LineCycleTime.value = input.cycletime.value * input.cycletime.factor * 1e6;
-			elements.ImageCycleTime.value = input.image.height * input.cycletime.value * input.cycletime.factor * 1e6;
+			elements.LineCycleTime.value = input.cycletime.value * input.cycletime.factor * 1e+6;
+			elements.ImageCycleTime.value = input.image.height * input.cycletime.value * input.cycletime.factor * 1e+6;
 			elements.LinesPerSecond.value = Math.round(1 / (input.cycletime.value * input.cycletime.factor));
 			elements.ImagesPerSecond.value = Math.round(1 / (input.image.height * input.cycletime.value * input.cycletime.factor));
 			elements.BytesPerImage.value = input.image.width * input.image.height * input.image.channels;
@@ -111,70 +96,71 @@
 </head>
 <body>
 
-<h1>Camera Configuration Calculus</h1>
+<div class="container">
 
-<fieldset>
-<legend>Specification</legend>
-<dl>
+	<div class="row">
+	<div class="column">
+		<h3>Camera Configuration Calculus</h3>
+	</div>
+	</div>
 
-	<dt><label for="ImageWidth">Image Width</label></dt>
-	<dd><input type="text" id="ImageWidth" onclick="this.select()" onkeyup="update()" value="2736"></dd>
+	<div class="row">
+	<div class="column">
 
-	<dt><label for="ImageHeight">Image Height</label></dt>
-	<dd><input type="text" id="ImageHeight" onclick="this.select()" onkeyup="update()" value="16"></dd>
+		<label for="ImageWidth">Image Width</label>
+		<input type="text" id="ImageWidth" onclick="this.select()" onkeyup="update()" value="1">
 
-	<dt><label for="ImageChannels">Image Channels</label></dt>
-	<dd><input type="text" id="ImageChannels" onclick="this.select()" onkeyup="update()" value="3"></dd>
+		<label for="ImageHeight">Image Height</label>
+		<input type="text" id="ImageHeight" onclick="this.select()" onkeyup="update()" value="1">
 
-	<dt><label for="CameraCount">Camera Count</label></dt>
-	<dd><input type="text" id="CameraCount" onclick="this.select()" onkeyup="update()" value="6"></dd>
+		<label for="ImageChannels">Image Channels</label>
+		<input type="text" id="ImageChannels" onclick="this.select()" onkeyup="update()" value="1">
 
-	<dt><label for="CycleTime">Cycle Time <span id="CycleTimeUnit"></span></label></dt>
-	<dd><input type="text" id="CycleTime" onclick="this.select()" onkeyup="update()" value="54"></dd>
-	<dd>
+		<label for="CameraCount">Camera Count</label>
+		<input type="text" id="CameraCount" onclick="this.select()" onkeyup="update()" value="1">
+
+		<label for="CycleTime">Cycle Time <span id="CycleTimeUnit"></span></label>
+		<input type="text" id="CycleTime" onclick="this.select()" onkeyup="update()" value="1">
+
+		<label>Cycle Target</label>
 
 		<input type="radio" id="CycleTimeTypeLine" name="CycleTimeType" onclick="update()" checked>
-		<label for="CycleTimeTypeLine">Line</label>
+		<label for="CycleTimeTypeLine" class="label-inline">Line</label>
+
+		&nbsp;
 
 		<input type="radio" id="CycleTimeTypeImage" name="CycleTimeType" onclick="update()">
-		<label for="CycleTimeTypeImage">Image</label>
+		<label for="CycleTimeTypeImage" class="label-inline">Image</label>
 
-	</dd>
+	</div>
+	<div class="column">
 
-</dl>
-</fieldset>
+		<label for="LineCycleTime">Line Cycle Time <span id="LineCycleTimeUnit"></span></label>
+		<input type="text" id="LineCycleTime" disabled>
 
-<fieldset>
-<legend>Result</legend>
-<dl>
+		<label for="ImageCycleTime">Image Cycle Time <span id="ImageCycleTimeUnit"></span></label>
+		<input type="text" id="ImageCycleTime" disabled>
 
-	<dt><label for="LineCycleTime">Line Cycle Time <span id="LineCycleTimeUnit"></span></label></dt>
-	<dd><input type="text" id="LineCycleTime" disabled></dd>
+		<label for="LinesPerSecond">Lines Per Second</label>
+		<input type="text" id="LinesPerSecond" disabled>
 
-	<dt><label for="ImageCycleTime">Image Cycle Time <span id="ImageCycleTimeUnit"></span></label></dt>
-	<dd><input type="text" id="ImageCycleTime" disabled></dd>
+		<label for="ImagesPerSecond">Images Per Second</label>
+		<input type="text" id="ImagesPerSecond" disabled>
 
-	<dt><label for="LinesPerSecond">Lines Per Second</label></dt>
-	<dd><input type="text" id="LinesPerSecond" disabled></dd>
+		<label for="BytesPerImage">Bytes Per Image</label>
+		<input type="text" id="BytesPerImage" disabled>
 
-	<dt><label for="ImagesPerSecond">Images Per Second</label></dt>
-	<dd><input type="text" id="ImagesPerSecond" disabled></dd>
+		<label for="GigaBitPerSecond">Total Gbit/s</label>
+		<input type="text" id="GigaBitPerSecond" disabled>
 
-	<dt><label for="BytesPerImage">Bytes Per Image</label></dt>
-	<dd><input type="text" id="BytesPerImage" disabled></dd>
+	</div>
+	</div>
 
-	<dt><label for="GigaBitPerSecond">Gbit/s</label></dt>
-	<dd><input type="text" id="GigaBitPerSecond" disabled> <span>&sum;</span></dd>
-
-</dl>
-</fieldset>
+</div>
 
 <script type="text/javascript">
 
-	window.addEventListener('load', function()
-	{
-	    update();
-	});
+	window.addEventListener('load', update);
 
 </script>
 
