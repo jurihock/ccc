@@ -57,7 +57,7 @@
 				{
 					value: NaN,
 					factor: NaN,
-				},
+				}
 			};
 
 			input.image.width = parseFloat(elements.ImageWidth.value);
@@ -68,27 +68,54 @@
 
 			if (elements.CycleTimeTypeLine.checked)
 			{
-				elements.CycleTimeUnit.textContent = '[us]';
-
 				input.cycletime.factor = 1e-6;
 			}
 
 			if (elements.CycleTimeTypeImage.checked)
 			{
-				elements.CycleTimeUnit.textContent = '[us]';
-
 				input.cycletime.factor = 1e-6 / input.image.height;
 			}
 
+			var output =
+			{
+				line:
+				{
+					cycletime: NaN,
+					frequency: NaN,
+					bytes: NaN,
+				},
+				image:
+				{
+					cycletime: NaN,
+					frequency: NaN,
+					bytes: NaN,
+				},
+				gbps: NaN
+			};
+
+			output.line.cycletime = input.cycletime.value * input.cycletime.factor * 1e+6;
+			output.image.cycletime = input.image.height * input.cycletime.value * input.cycletime.factor * 1e+6;
+
+			output.line.frequency = Math.round(1 / (input.cycletime.value * input.cycletime.factor));
+			output.image.frequency = Math.round(1 / (input.image.height * input.cycletime.value * input.cycletime.factor));
+
+			output.line.bytes = input.image.width * input.image.channels;
+			output.image.bytes = input.image.height * input.image.width * input.image.channels;
+
+			output.gbps = input.camera.count * output.image.frequency * output.image.bytes * (8 / Math.pow(1024, 3));
+
+			elements.CycleTimeUnit.textContent = '[us]';
 			elements.LineCycleTimeUnit.textContent = '[us]';
 			elements.ImageCycleTimeUnit.textContent = '[us]';
 
-			elements.LineCycleTime.value = input.cycletime.value * input.cycletime.factor * 1e+6;
-			elements.ImageCycleTime.value = input.image.height * input.cycletime.value * input.cycletime.factor * 1e+6;
-			elements.LinesPerSecond.value = Math.round(1 / (input.cycletime.value * input.cycletime.factor));
-			elements.ImagesPerSecond.value = Math.round(1 / (input.image.height * input.cycletime.value * input.cycletime.factor));
-			elements.BytesPerImage.value = input.image.width * input.image.height * input.image.channels;
-			elements.GigaBitPerSecond.value = input.camera.count * parseFloat(elements.ImagesPerSecond.value) * parseFloat(elements.BytesPerImage.value) * (8 / Math.pow(1024, 3));
+			elements.LineCycleTime.value = output.line.cycletime;
+			elements.ImageCycleTime.value = output.image.cycletime;
+
+			elements.LinesPerSecond.value = output.line.frequency;
+			elements.ImagesPerSecond.value = output.image.frequency;
+
+			elements.BytesPerImage.value = output.image.bytes;
+			elements.GigaBitPerSecond.value = output.gbps;
 		}
 
 	</script>
