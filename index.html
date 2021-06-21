@@ -3,17 +3,9 @@
 
 	<title>Camera Configuration Calculus</title>
 
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
+	<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
 
 	<style>
-
-		body
-		{
-			margin-top:  1em;
-		}
-
 	</style>
 
 	<script>
@@ -121,66 +113,88 @@
 	</script>
 
 </head>
-<body>
+<body class="p-0 m-0 bg-white text-black">
 
-<div class="container">
+<div class="container mx-auto">
 
-	<div class="row">
-	<div class="column">
-		<h3>Camera Configuration Calculus</h3>
-	</div>
-	</div>
+	<div class="mt-3 mx-3 text-xl font-medium">Camera Configuration Calculus</div>
 
-	<div class="row">
-	<div class="column">
+	<div class="flex flex-row flex-wrap">
 
-		<label for="ImageWidth">Image Width</label>
-		<input type="text" id="ImageWidth" onclick="this.select()" onkeyup="update()" value="1">
+		<div class="flex-1 p-3 space-y-3">
 
-		<label for="ImageHeight">Image Height</label>
-		<input type="text" id="ImageHeight" onclick="this.select()" onkeyup="update()" value="1">
+			<div class="flex flex-col">
+				<label for="ImageWidth">Image Width</label>
+				<input type="text" id="ImageWidth" onclick="this.select()" onkeyup="update()" value="1">
+			</div>
 
-		<label for="ImageChannels">Image Channels</label>
-		<input type="text" id="ImageChannels" onclick="this.select()" onkeyup="update()" value="1">
+			<div class="flex flex-col">
+				<label for="ImageHeight">Image Height</label>
+				<input type="text" id="ImageHeight" onclick="this.select()" onkeyup="update()" value="1">
+			</div>
 
-		<label for="CameraCount">Camera Count</label>
-		<input type="text" id="CameraCount" onclick="this.select()" onkeyup="update()" value="1">
+			<div class="flex flex-col">
+				<label for="ImageChannels">Image Channels</label>
+				<input type="text" id="ImageChannels" onclick="this.select()" onkeyup="update()" value="1">
+			</div>
 
-		<label for="CycleTime">Cycle Time <span id="CycleTimeUnit"></span></label>
-		<input type="text" id="CycleTime" onclick="this.select()" onkeyup="update()" value="1">
+			<div class="flex flex-col">
+				<label for="CameraCount">Camera Count</label>
+				<input type="text" id="CameraCount" onclick="this.select()" onkeyup="update()" value="1">
+			</div>
 
-		<label>Cycle Target</label>
+			<div class="flex flex-col">
+				<label for="CycleTime">Cycle Time <span id="CycleTimeUnit"></span></label>
+				<input type="text" id="CycleTime" onclick="this.select()" onkeyup="update()" value="1">
+			</div>
 
-		<input type="radio" id="CycleTimeTypeLine" name="CycleTimeType" onclick="update()" checked>
-		<label for="CycleTimeTypeLine" class="label-inline">Line</label>
+			<div class="flex flex-col">
+				<label>Cycle Target</label>
+				<div>
+					<input type="radio" id="CycleTimeTypeLine" name="CycleTimeType" onclick="update()" checked>
+					<label for="CycleTimeTypeLine">Line</label>
+					&nbsp;
+					<input type="radio" id="CycleTimeTypeImage" name="CycleTimeType" onclick="update()">
+					<label for="CycleTimeTypeImage">Image</label>
+				</div>
+			</div>
 
-		&nbsp;
+		</div>
 
-		<input type="radio" id="CycleTimeTypeImage" name="CycleTimeType" onclick="update()">
-		<label for="CycleTimeTypeImage" class="label-inline">Image</label>
+		<div class="flex-1 p-3 space-y-3">
 
-	</div>
-	<div class="column">
+			<div class="flex flex-col">
+				<label for="LineCycleTime">Line Cycle Time <span id="LineCycleTimeUnit"></span></label>
+				<input type="text" id="LineCycleTime" disabled>
+			</div>
 
-		<label for="LineCycleTime">Line Cycle Time <span id="LineCycleTimeUnit"></span></label>
-		<input type="text" id="LineCycleTime" disabled>
+			<div class="flex flex-col">
+				<label for="ImageCycleTime">Image Cycle Time <span id="ImageCycleTimeUnit"></span></label>
+				<input type="text" id="ImageCycleTime" disabled>
+			</div>
 
-		<label for="ImageCycleTime">Image Cycle Time <span id="ImageCycleTimeUnit"></span></label>
-		<input type="text" id="ImageCycleTime" disabled>
+			<div class="flex flex-col">
+				<label for="LinesPerSecond">Lines Per Second</label>
+				<input type="text" id="LinesPerSecond" disabled>
+			</div>
 
-		<label for="LinesPerSecond">Lines Per Second</label>
-		<input type="text" id="LinesPerSecond" disabled>
+			<div class="flex flex-col">
+				<label for="ImagesPerSecond">Images Per Second</label>
+				<input type="text" id="ImagesPerSecond" disabled>
+			</div>
 
-		<label for="ImagesPerSecond">Images Per Second</label>
-		<input type="text" id="ImagesPerSecond" disabled>
+			<div class="flex flex-col">
+				<label for="BytesPerImage">Bytes Per Image</label>
+				<input type="text" id="BytesPerImage" disabled>
+			</div>
 
-		<label for="BytesPerImage">Bytes Per Image</label>
-		<input type="text" id="BytesPerImage" disabled>
+			<div class="flex flex-col">
+				<label for="GigaBitPerSecond">Total Gbit/s</label>
+				<input type="text" id="GigaBitPerSecond" disabled>
+			</div>
 
-		<label for="GigaBitPerSecond">Total Gbit/s</label>
-		<input type="text" id="GigaBitPerSecond" disabled>
+		</div>
 
-	</div>
 	</div>
 
 </div>
@@ -188,6 +202,28 @@
 <script type="text/javascript">
 
 	window.addEventListener('load', update);
+
+	var labels = document.getElementsByTagName('label');
+
+	for (var i = 0; i < labels.length; i++)
+	{
+		labels[i].className += ' mb-1 font-light';
+	}
+
+	var inputs = document.getElementsByTagName('input');
+
+	for (var i = 0; i < inputs.length; i++)
+	{
+		if (inputs[i].type == 'text')
+		{
+			inputs[i].className += ' p-1 border rounded font-light';
+
+			if (inputs[i].disabled)
+			{
+				inputs[i].className += ' bg-gray-50';
+			}
+		}
+	}
 
 </script>
 
