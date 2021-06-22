@@ -7,32 +7,13 @@
 
 	<script type="text/javascript">
 
-		function toggle()
-		{
-			var line = document.getElementById('CycleTimeTargetLine');
-			var frame = document.getElementById('CycleTimeTargetFrame');
-
-			if (line.checked)
-			{
-				line.checked = false;
-				frame.checked = true;
-			}
-			else if (frame.checked)
-			{
-				line.checked = true;
-				frame.checked = false;
-			}
-
-			update();
-		}
-
-		function update()
+		function commit()
 		{
 			var elements =
 			{
 				ImageWidth: document.getElementById('ImageWidth'),
 				ImageHeight: document.getElementById('ImageHeight'),
-				ImageChannels: document.getElementById('ImageChannels'),
+				ImageBytes: document.getElementById('ImageBytes'),
 				CameraCount: document.getElementById('CameraCount'),
 				CycleTime: document.getElementById('CycleTime'),
 				CycleTimeUnit: document.getElementById('CycleTimeUnit'),
@@ -49,13 +30,28 @@
 				GigabitPerSecond: document.getElementById('GigabitPerSecond'),
 			};
 
+			if (elements.ImageWidth.value === '0')
+			{
+				elements.ImageWidth.value = 1;
+			}
+
+			if (elements.ImageHeight.value === '0')
+			{
+				elements.ImageHeight.value = 1;
+			}
+
+			if (elements.CycleTime.value === '0')
+			{
+				elements.CycleTime.value = 1;
+			}
+
 			var input =
 			{
 				image:
 				{
 					width: NaN,
 					height: NaN,
-					channels: NaN,
+					bytes: NaN,
 				},
 				camera:
 				{
@@ -66,9 +62,9 @@
 
 			input.image.width = parseInt(elements.ImageWidth.value);
 			input.image.height = parseInt(elements.ImageHeight.value);
-			input.image.channels = parseInt(elements.ImageChannels.value);
+			input.image.bytes = parseInt(elements.ImageBytes.value);
 			input.camera.count = parseInt(elements.CameraCount.value);
-			input.camera.cycletime = parseFloat(elements.CycleTime.value.replace(',', '.'));
+			input.camera.cycletime = parseInt(elements.CycleTime.value);
 
 			if (elements.CycleTimeTargetLine.checked)
 			{
@@ -104,8 +100,8 @@
 			output.line.frequency = Math.round(1 / (input.camera.cycletime));
 			output.frame.frequency = Math.round(1 / (input.image.height * input.camera.cycletime));
 
-			output.line.bytes = input.image.width * input.image.channels;
-			output.frame.bytes = input.image.height * input.image.width * input.image.channels;
+			output.line.bytes = input.image.width * input.image.bytes;
+			output.frame.bytes = input.image.height * input.image.width * input.image.bytes;
 
 			output.gbps = input.camera.count * output.frame.frequency * output.frame.bytes * (8 / Math.pow(1024, 3));
 
@@ -123,6 +119,25 @@
 			elements.GigabitPerSecond.value = output.gbps;
 		}
 
+		function toggle()
+		{
+			var line = document.getElementById('CycleTimeTargetLine');
+			var frame = document.getElementById('CycleTimeTargetFrame');
+
+			if (line.checked)
+			{
+				line.checked = false;
+				frame.checked = true;
+			}
+			else if (frame.checked)
+			{
+				line.checked = true;
+				frame.checked = false;
+			}
+
+			commit();
+		}
+
 	</script>
 
 </head>
@@ -138,36 +153,36 @@
 
 				<div class="flex flex-col">
 					<label for="ImageWidth">Image Width</label>
-					<input type="text" id="ImageWidth" onclick="this.select()" onkeyup="update()" value="1000">
+					<input type="number" min="0" step="100" id="ImageWidth" onclick="this.select()" oninput="commit()" value="1000">
 				</div>
 
 				<div class="flex flex-col">
 					<label for="ImageHeight">Image Height</label>
-					<input type="text" id="ImageHeight" onclick="this.select()" onkeyup="update()" value="1">
+					<input type="number" min="0" step="100" id="ImageHeight" onclick="this.select()" oninput="commit()" value="1">
 				</div>
 
 				<div class="flex flex-col">
-					<label for="ImageChannels">Image Channels</label>
-					<input type="text" id="ImageChannels" onclick="this.select()" onkeyup="update()" value="1">
+					<label for="ImageBytes">Bytes Per Pixel</label>
+					<input type="number" min="1" id="ImageBytes" onclick="this.select()" oninput="commit()" value="1">
 				</div>
 
 				<div class="flex flex-col">
 					<label for="CameraCount">Camera Count</label>
-					<input type="text" id="CameraCount" onclick="this.select()" onkeyup="update()" value="1">
+					<input type="number" min="1" id="CameraCount" onclick="this.select()" oninput="commit()" value="1">
 				</div>
 
 				<div class="flex flex-col">
 					<label for="CycleTime">Cycle Time <span class="text-gray-500" id="CycleTimeUnit"></span></label>
-					<input type="text" id="CycleTime" onclick="this.select()" onkeyup="update()" value="1000">
+					<input type="number" min="0" step="100" id="CycleTime" onclick="this.select()" oninput="commit()" value="1000">
 				</div>
 
 				<div class="flex flex-col">
 					<label onclick="toggle()">Cycle Target</label>
 					<div>
-						<input type="radio" id="CycleTimeTargetLine" name="CycleTimeTarget" onclick="update()" checked>
+						<input type="radio" id="CycleTimeTargetLine" name="CycleTimeTarget" oninput="commit()" checked>
 						<label for="CycleTimeTargetLine">Line</label>
 						&nbsp;
-						<input type="radio" id="CycleTimeTargetFrame" name="CycleTimeTarget" onclick="update()">
+						<input type="radio" id="CycleTimeTargetFrame" name="CycleTimeTarget" oninput="commit()">
 						<label for="CycleTimeTargetFrame">Frame</label>
 					</div>
 				</div>
@@ -225,7 +240,7 @@
 
 		for (var i = 0; i < inputs.length; i++)
 		{
-			if (inputs[i].type == 'text')
+			if (inputs[i].type === 'number' || inputs[i].type === 'text')
 			{
 				inputs[i].className += ' p-1 border rounded font-light';
 
@@ -236,7 +251,7 @@
 			}
 		}
 
-		window.addEventListener('load', update);
+		window.addEventListener('load', commit);
 
 	</script>
 
