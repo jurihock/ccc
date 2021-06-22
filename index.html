@@ -109,9 +109,9 @@
 
 			output.gbps = input.camera.count * output.frame.frequency * output.frame.bytes * (8 / Math.pow(1024, 3));
 
-			elements.CycleTimeUnit.textContent = '[us]';
-			elements.LineCycleTimeUnit.textContent = '[us]';
-			elements.FrameCycleTimeUnit.textContent = '[us]';
+			elements.CycleTimeUnit.innerHTML = '[&micro;s]';
+			elements.LineCycleTimeUnit.innerHTML = '[&micro;s]';
+			elements.FrameCycleTimeUnit.innerHTML = '[&micro;s]';
 
 			elements.LineCycleTime.value = output.line.cycletime;
 			elements.FrameCycleTime.value = output.frame.cycletime;
