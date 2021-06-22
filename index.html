@@ -3,12 +3,28 @@
 
 	<title>Camera Configuration Calculus</title>
 
-	<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css">
 
-	<style>
-	</style>
+	<script type="text/javascript">
 
-	<script>
+		function toggle()
+		{
+			var line = document.getElementById('CycleTimeTargetLine');
+			var frame = document.getElementById('CycleTimeTargetFrame');
+
+			if (line.checked)
+			{
+				line.checked = false;
+				frame.checked = true;
+			}
+			else if (frame.checked)
+			{
+				line.checked = true;
+				frame.checked = false;
+			}
+
+			update();
+		}
 
 		function update()
 		{
@@ -20,17 +36,17 @@
 				CameraCount: document.getElementById('CameraCount'),
 				CycleTime: document.getElementById('CycleTime'),
 				CycleTimeUnit: document.getElementById('CycleTimeUnit'),
-				CycleTimeTypeLine: document.getElementById('CycleTimeTypeLine'),
-				CycleTimeTypeImage: document.getElementById('CycleTimeTypeImage'),
+				CycleTimeTargetLine: document.getElementById('CycleTimeTargetLine'),
+				CycleTimeTargetFrame: document.getElementById('CycleTimeTargetFrame'),
 
-				ImageCycleTime: document.getElementById('ImageCycleTime'),
-				ImageCycleTimeUnit: document.getElementById('ImageCycleTimeUnit'),
 				LineCycleTime: document.getElementById('LineCycleTime'),
 				LineCycleTimeUnit: document.getElementById('LineCycleTimeUnit'),
+				FrameCycleTime: document.getElementById('FrameCycleTime'),
+				FrameCycleTimeUnit: document.getElementById('FrameCycleTimeUnit'),
 				LinesPerSecond: document.getElementById('LinesPerSecond'),
-				ImagesPerSecond: document.getElementById('ImagesPerSecond'),
-				BytesPerImage: document.getElementById('BytesPerImage'),
-				GigaBitPerSecond: document.getElementById('GigaBitPerSecond'),
+				FramesPerSecond: document.getElementById('FramesPerSecond'),
+				BytesPerFrame: document.getElementById('BytesPerFrame'),
+				GigabitPerSecond: document.getElementById('GigabitPerSecond'),
 			};
 
 			var input =
@@ -44,28 +60,25 @@
 				camera:
 				{
 					count: NaN,
-				},
-				cycletime:
-				{
-					value: NaN,
-					factor: NaN,
+					cycletime: NaN,
 				}
 			};
 
-			input.image.width = parseFloat(elements.ImageWidth.value);
-			input.image.height = parseFloat(elements.ImageHeight.value);
-			input.image.channels = parseFloat(elements.ImageChannels.value);
-			input.camera.count = parseFloat(elements.CameraCount.value);
-			input.cycletime.value = parseFloat(elements.CycleTime.value.replace(',', '.'));
+			input.image.width = parseInt(elements.ImageWidth.value);
+			input.image.height = parseInt(elements.ImageHeight.value);
+			input.image.channels = parseInt(elements.ImageChannels.value);
+			input.camera.count = parseInt(elements.CameraCount.value);
+			input.camera.cycletime = parseFloat(elements.CycleTime.value.replace(',', '.'));
 
-			if (elements.CycleTimeTypeLine.checked)
+			if (elements.CycleTimeTargetLine.checked)
 			{
-				input.cycletime.factor = 1e-6;
+				input.camera.cycletime *= 1e-6;
 			}
 
-			if (elements.CycleTimeTypeImage.checked)
+			if (elements.CycleTimeTargetFrame.checked)
 			{
-				input.cycletime.factor = 1e-6 / input.image.height;
+				input.camera.cycletime *= 1e-6;
+				input.camera.cycletime /= input.image.height;
 			}
 
 			var output =
@@ -76,7 +89,7 @@
 					frequency: NaN,
 					bytes: NaN,
 				},
-				image:
+				frame:
 				{
 					cycletime: NaN,
 					frequency: NaN,
@@ -85,29 +98,29 @@
 				gbps: NaN
 			};
 
-			output.line.cycletime = input.cycletime.value * input.cycletime.factor * 1e+6;
-			output.image.cycletime = input.image.height * input.cycletime.value * input.cycletime.factor * 1e+6;
+			output.line.cycletime = input.camera.cycletime * 1e+6;
+			output.frame.cycletime = input.image.height * input.camera.cycletime * 1e+6;
 
-			output.line.frequency = Math.round(1 / (input.cycletime.value * input.cycletime.factor));
-			output.image.frequency = Math.round(1 / (input.image.height * input.cycletime.value * input.cycletime.factor));
+			output.line.frequency = Math.round(1 / (input.camera.cycletime));
+			output.frame.frequency = Math.round(1 / (input.image.height * input.camera.cycletime));
 
 			output.line.bytes = input.image.width * input.image.channels;
-			output.image.bytes = input.image.height * input.image.width * input.image.channels;
+			output.frame.bytes = input.image.height * input.image.width * input.image.channels;
 
-			output.gbps = input.camera.count * output.image.frequency * output.image.bytes * (8 / Math.pow(1024, 3));
+			output.gbps = input.camera.count * output.frame.frequency * output.frame.bytes * (8 / Math.pow(1024, 3));
 
 			elements.CycleTimeUnit.textContent = '[us]';
 			elements.LineCycleTimeUnit.textContent = '[us]';
-			elements.ImageCycleTimeUnit.textContent = '[us]';
+			elements.FrameCycleTimeUnit.textContent = '[us]';
 
 			elements.LineCycleTime.value = output.line.cycletime;
-			elements.ImageCycleTime.value = output.image.cycletime;
+			elements.FrameCycleTime.value = output.frame.cycletime;
 
 			elements.LinesPerSecond.value = output.line.frequency;
-			elements.ImagesPerSecond.value = output.image.frequency;
+			elements.FramesPerSecond.value = output.frame.frequency;
 
-			elements.BytesPerImage.value = output.image.bytes;
-			elements.GigaBitPerSecond.value = output.gbps;
+			elements.BytesPerFrame.value = output.frame.bytes;
+			elements.GigabitPerSecond.value = output.gbps;
 		}
 
 	</script>
@@ -115,117 +128,117 @@
 </head>
 <body class="p-0 m-0 bg-white text-black">
 
-<div class="container mx-auto">
+	<div class="container mx-auto">
 
-	<div class="mt-3 mx-3 text-xl font-medium">Camera Configuration Calculus</div>
+		<div class="mt-3 mx-3 text-xl font-medium">Camera Configuration Calculus</div>
 
-	<div class="flex flex-row flex-wrap">
+		<div class="flex flex-row flex-wrap">
 
-		<div class="flex-1 p-3 space-y-3">
+			<div class="flex-1 p-3 space-y-3">
 
-			<div class="flex flex-col">
-				<label for="ImageWidth">Image Width</label>
-				<input type="text" id="ImageWidth" onclick="this.select()" onkeyup="update()" value="1">
-			</div>
-
-			<div class="flex flex-col">
-				<label for="ImageHeight">Image Height</label>
-				<input type="text" id="ImageHeight" onclick="this.select()" onkeyup="update()" value="1">
-			</div>
-
-			<div class="flex flex-col">
-				<label for="ImageChannels">Image Channels</label>
-				<input type="text" id="ImageChannels" onclick="this.select()" onkeyup="update()" value="1">
-			</div>
-
-			<div class="flex flex-col">
-				<label for="CameraCount">Camera Count</label>
-				<input type="text" id="CameraCount" onclick="this.select()" onkeyup="update()" value="1">
-			</div>
-
-			<div class="flex flex-col">
-				<label for="CycleTime">Cycle Time <span id="CycleTimeUnit"></span></label>
-				<input type="text" id="CycleTime" onclick="this.select()" onkeyup="update()" value="1">
-			</div>
-
-			<div class="flex flex-col">
-				<label>Cycle Target</label>
-				<div>
-					<input type="radio" id="CycleTimeTypeLine" name="CycleTimeType" onclick="update()" checked>
-					<label for="CycleTimeTypeLine">Line</label>
-					&nbsp;
-					<input type="radio" id="CycleTimeTypeImage" name="CycleTimeType" onclick="update()">
-					<label for="CycleTimeTypeImage">Image</label>
+				<div class="flex flex-col">
+					<label for="ImageWidth">Image Width</label>
+					<input type="text" id="ImageWidth" onclick="this.select()" onkeyup="update()" value="1000">
 				</div>
+
+				<div class="flex flex-col">
+					<label for="ImageHeight">Image Height</label>
+					<input type="text" id="ImageHeight" onclick="this.select()" onkeyup="update()" value="1">
+				</div>
+
+				<div class="flex flex-col">
+					<label for="ImageChannels">Image Channels</label>
+					<input type="text" id="ImageChannels" onclick="this.select()" onkeyup="update()" value="1">
+				</div>
+
+				<div class="flex flex-col">
+					<label for="CameraCount">Camera Count</label>
+					<input type="text" id="CameraCount" onclick="this.select()" onkeyup="update()" value="1">
+				</div>
+
+				<div class="flex flex-col">
+					<label for="CycleTime">Cycle Time <span class="text-gray-500" id="CycleTimeUnit"></span></label>
+					<input type="text" id="CycleTime" onclick="this.select()" onkeyup="update()" value="1000">
+				</div>
+
+				<div class="flex flex-col">
+					<label onclick="toggle()">Cycle Target</label>
+					<div>
+						<input type="radio" id="CycleTimeTargetLine" name="CycleTimeTarget" onclick="update()" checked>
+						<label for="CycleTimeTargetLine">Line</label>
+						&nbsp;
+						<input type="radio" id="CycleTimeTargetFrame" name="CycleTimeTarget" onclick="update()">
+						<label for="CycleTimeTargetFrame">Frame</label>
+					</div>
+				</div>
+
 			</div>
 
-		</div>
+			<div class="flex-1 p-3 space-y-3">
 
-		<div class="flex-1 p-3 space-y-3">
+				<div class="flex flex-col">
+					<label for="LineCycleTime">Line Cycle Time <span class="text-gray-500" id="LineCycleTimeUnit"></span></label>
+					<input type="text" id="LineCycleTime" readonly>
+				</div>
 
-			<div class="flex flex-col">
-				<label for="LineCycleTime">Line Cycle Time <span id="LineCycleTimeUnit"></span></label>
-				<input type="text" id="LineCycleTime" disabled>
-			</div>
+				<div class="flex flex-col">
+					<label for="FrameCycleTime">Frame Cycle Time <span class="text-gray-500" id="FrameCycleTimeUnit"></span></label>
+					<input type="text" id="FrameCycleTime" readonly>
+				</div>
 
-			<div class="flex flex-col">
-				<label for="ImageCycleTime">Image Cycle Time <span id="ImageCycleTimeUnit"></span></label>
-				<input type="text" id="ImageCycleTime" disabled>
-			</div>
+				<div class="flex flex-col">
+					<label for="LinesPerSecond">Lines Per Second</label>
+					<input type="text" id="LinesPerSecond" readonly>
+				</div>
 
-			<div class="flex flex-col">
-				<label for="LinesPerSecond">Lines Per Second</label>
-				<input type="text" id="LinesPerSecond" disabled>
-			</div>
+				<div class="flex flex-col">
+					<label for="FramesPerSecond">Frames Per Second</label>
+					<input type="text" id="FramesPerSecond" readonly>
+				</div>
 
-			<div class="flex flex-col">
-				<label for="ImagesPerSecond">Images Per Second</label>
-				<input type="text" id="ImagesPerSecond" disabled>
-			</div>
+				<div class="flex flex-col">
+					<label for="BytesPerFrame">Bytes Per Frame</label>
+					<input type="text" id="BytesPerFrame" readonly>
+				</div>
 
-			<div class="flex flex-col">
-				<label for="BytesPerImage">Bytes Per Image</label>
-				<input type="text" id="BytesPerImage" disabled>
-			</div>
+				<div class="flex flex-col">
+					<label for="GigabitPerSecond">Total Throughput <span class="text-gray-500">[Gbit/s]</span></label>
+					<input type="text" id="GigabitPerSecond" readonly>
+				</div>
 
-			<div class="flex flex-col">
-				<label for="GigaBitPerSecond">Total Gbit/s</label>
-				<input type="text" id="GigaBitPerSecond" disabled>
 			</div>
 
 		</div>
 
 	</div>
 
-</div>
+	<script type="text/javascript">
 
-<script type="text/javascript">
+		var labels = document.getElementsByTagName('label');
 
-	window.addEventListener('load', update);
-
-	var labels = document.getElementsByTagName('label');
-
-	for (var i = 0; i < labels.length; i++)
-	{
-		labels[i].className += ' mb-1 font-light';
-	}
-
-	var inputs = document.getElementsByTagName('input');
-
-	for (var i = 0; i < inputs.length; i++)
-	{
-		if (inputs[i].type == 'text')
+		for (var i = 0; i < labels.length; i++)
 		{
-			inputs[i].className += ' p-1 border rounded font-light';
+			labels[i].className += ' mb-1 font-light';
+		}
 
-			if (inputs[i].disabled)
+		var inputs = document.getElementsByTagName('input');
+
+		for (var i = 0; i < inputs.length; i++)
+		{
+			if (inputs[i].type == 'text')
 			{
-				inputs[i].className += ' bg-gray-50';
+				inputs[i].className += ' p-1 border rounded font-light';
+
+				if (inputs[i].readOnly)
+				{
+					inputs[i].className += ' bg-gray-50';
+				}
 			}
 		}
-	}
 
-</script>
+		window.addEventListener('load', update);
+
+	</script>
 
 </body>
 </html>
