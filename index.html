@@ -179,22 +179,46 @@
 
 			if (query.has('w'))
 			{
-				elements.ImageWidth.value = parseInt(query.get('w'));
+				elements.ImageWidth.value = query.get('w');
 			}
 
 			if (query.has('h'))
 			{
-				elements.ImageHeight.value = parseInt(query.get('h'));
+				elements.ImageHeight.value = query.get('h');
 			}
 
 			if (query.has('b'))
 			{
-				elements.ImageBytes.value = parseInt(query.get('b'));
+				elements.ImageBytes.value = query.get('b');
 			}
 
 			if (query.has('c'))
 			{
-				elements.CameraCount.value = parseInt(query.get('c'));
+				elements.CameraCount.value = query.get('c');
+			}
+
+			if (query.has('t'))
+			{
+				elements.CycleTime.value = query.get('t');
+			}
+
+			if (query.has('lf'))
+			{
+				if (query.get('lf') == 'l')
+				{
+					elements.CycleTimeTargetLine.checked = true;
+					elements.CycleTimeTargetFrame.checked = false;
+				}
+				else if (query.get('lf') == 'f')
+				{
+					elements.CycleTimeTargetLine.checked = false;
+					elements.CycleTimeTargetFrame.checked = true;
+				}
+				else
+				{
+					elements.CycleTimeTargetLine.checked = false;
+					elements.CycleTimeTargetFrame.checked = false;
+				}
 			}
 
 			commit();
