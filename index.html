@@ -4,6 +4,7 @@
 	<title>Camera Configuration Calculus</title>
 
 	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
 
 	<script type="text/javascript">
 
@@ -172,7 +173,9 @@
 				CameraCount: document.getElementById('CameraCount'),
 				CycleTime: document.getElementById('CycleTime'),
 				CycleTimeTargetLine: document.getElementById('CycleTimeTargetLine'),
-				CycleTimeTargetFrame: document.getElementById('CycleTimeTargetFrame')
+				CycleTimeTargetFrame: document.getElementById('CycleTimeTargetFrame'),
+
+				Hyperlink: document.getElementById('Hyperlink')
 			};
 
 			var query = new URLSearchParams(window.location.search);
@@ -222,6 +225,14 @@
 			}
 
 			commit();
+
+			new ClipboardJS(Hyperlink,
+			{
+				text: function (trigger)
+				{
+					return trigger.getAttribute('href');
+				}
+			});
 		}
 
 	</script>
